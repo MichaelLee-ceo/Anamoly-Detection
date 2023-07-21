@@ -11,10 +11,10 @@ from utils import *
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset", default="windmill", type=str)
 parser.add_argument('--num_epochs', default=50, type=int)
-parser.add_argument('--lr', default=0.001, type=float)
-parser.add_argument('--batch_size', default=64, type=int)
+parser.add_argument('--lr', default=0.003, type=float)
+parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--img_size', default=256, type=int)
-parser.add_argument('--latent_dim', default=32, type=int)
+parser.add_argument('--latent_dim', default=128, type=int)
 parser.add_argument('--ckpt_pth', default="./checkpoint/", type=str)
 parser.add_argument('--seed', default=0, type=int)
 args = parser.parse_args()
@@ -37,6 +37,7 @@ os.makedirs(args.ckpt_pth, exist_ok=True)
 
 ''' Load trainin data '''
 train_dataloader, test_dataloader = load_data(dataset_name=dataset_name, normal_class=0, args=args)
+# save_image(make_grid(next(iter(train_dataloader))[:32][0]), dataset_name + "_normal.png")
 
 ''' Autoencoder model '''
 model = AutoEncoder_CNN(channel=3, dim=latent_dim, large=True).to(device)

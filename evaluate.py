@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_name', default="windmill", type=str)
 parser.add_argument('--batch_size', default=32, type=int)
 parser.add_argument('--img_size', default=256, type=int)
-parser.add_argument('--latent_dim', default=32, type=int)
+parser.add_argument('--latent_dim', default=128, type=int)
 parser.add_argument('--ckpt_pth', default="./checkpoint/", type=str)
 parser.add_argument('--figure_dir', default="./figures/", type=str)
 parser.add_argument('--num_samples', default=50, type=int)
@@ -68,6 +68,9 @@ for img, label in train_dataloader:
 
 # Calculate the average reconstruction error on normal training data
 avg_normal_error = np.mean(training_error)
+result.append({
+    "Average Normal Error": avg_normal_error
+})
 
 # Evaluate on testing data
 for idx, (img, label) in enumerate(tqdm(test_dataloader)):

@@ -5,17 +5,8 @@ from PIL import Image
 import numpy as np
 from torchvision import transforms
 from torchvision import datasets
-from torchvision.datasets import ImageFolder
 from torch.utils.data import Dataset, DataLoader
 
-def get_data_transforms(size, crop_size):
-    data_transforms = transforms.Compose([
-        transforms.Resize((size, size)),
-        transforms.ToTensor(),
-        transforms.CenterCrop(crop_size),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    return data_transforms
 
 def load_data(dataset_name="mnist", normal_class=0, args=None):
     img_size = args.img_size
