@@ -41,9 +41,9 @@ class cnn_layer(nn.Module):
         return self.main(x)
 
 class cnn_encoder_64(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, in_channel, dim):
         super(cnn_encoder_64, self).__init__()
-        self.block1 = cnn_layer(1, 64)
+        self.block1 = cnn_layer(in_channel, 64)
         self.block2 = cnn_layer(64, 128)
         self.block3 = cnn_layer(128, 256)
         self.block4 = cnn_layer(256, 512)
@@ -64,7 +64,7 @@ class cnn_encoder_64(nn.Module):
         return x
     
 class cnn_decoder_64(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, out_channel, dim):
         super(cnn_decoder_64, self).__init__()
         self.block1 = nn.Sequential(
             nn.ConvTranspose2d(dim, 512, kernel_size=4),
@@ -75,7 +75,7 @@ class cnn_decoder_64(nn.Module):
         self.block3 = cnn_layer(256, 128)
         self.block4 = cnn_layer(128, 64)
         self.block5 = nn.Sequential(
-            nn.ConvTranspose2d(64, 1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(64, out_channel, kernel_size=3, stride=1, padding=1),
             nn.Sigmoid(),
         )
 
@@ -92,9 +92,9 @@ class cnn_decoder_64(nn.Module):
 # ====================================================== #
 
 class cnn_encoder_256(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, in_channel, dim):
         super(cnn_encoder_256, self).__init__()
-        self.block1 = cnn_layer(1, 64)
+        self.block1 = cnn_layer(in_channel, 64)
         self.block2 = cnn_layer(64, 128)
         self.block3 = cnn_layer(128, 128)
         self.block4 = cnn_layer(128, 256)
@@ -119,7 +119,7 @@ class cnn_encoder_256(nn.Module):
         return x
     
 class cnn_decoder_256(nn.Module):
-    def __init__(self, dim):
+    def __init__(self, out_channel, dim):
         super(cnn_decoder_256, self).__init__()
         self.block1 = nn.Sequential(
             nn.ConvTranspose2d(dim, 512, kernel_size=4),
@@ -132,7 +132,7 @@ class cnn_decoder_256(nn.Module):
         self.block5 = cnn_layer(128, 128)
         self.block6 = cnn_layer(128, 64)
         self.block7 = nn.Sequential(
-            nn.ConvTranspose2d(64, 1, kernel_size=3, stride=1, padding=1),
+            nn.ConvTranspose2d(64, out_channel, kernel_size=3, stride=1, padding=1),
             nn.Sigmoid(),
         )
 
@@ -150,15 +150,15 @@ class cnn_decoder_256(nn.Module):
 
 
 class AutoEncoder_CNN(nn.Module):
-    def __init__(self, dim, large=True):
+    def __init__(self, channel=3, dim=32, large=True):
         super(AutoEncoder_CNN, self).__init__()
 
         if large:
-            self.encoder = cnn_encoder_256(dim=dim)
-            self.decoder = cnn_decoder_256(dim=dim)
+            self.encoder = cnn_encoder_256(in_channel=channel, dim=dim)
+            self.decoder = cnn_decoder_256(out_channel=channel, dim=dim)
         else:
-            self.encoder = cnn_encoder_64(dim=dim)
-            self.decoder = cnn_decoder_64(dim=dim)
+            self.encoder = cnn_encoder_64(in_channel=channel, dim=dim)
+            self.decoder = cnn_decoder_64(out_channel=channel, dim=dim)
 
     def forward(self, x):
         x = self.encoder(x)
