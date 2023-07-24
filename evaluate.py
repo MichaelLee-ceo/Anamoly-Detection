@@ -9,11 +9,11 @@ from dataset import load_data
 from models.model import *
 from utils import *
 from torchvision.utils import make_grid, save_image
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset_name', default="windmill", type=str)
-parser.add_argument('--batch_size', default=32, type=int)
+parser.add_argument('--batch_size', default=1, type=int)
 parser.add_argument('--img_size', default=256, type=int)
 parser.add_argument('--latent_dim', default=128, type=int)
 parser.add_argument('--ckpt_pth', default="./checkpoint/", type=str)
@@ -44,9 +44,7 @@ ckp_path = ckpt_path + dataset_name +'.pth'
 figure_path = args.figure_dir + dataset_name
 os.makedirs(figure_path, exist_ok=True)
 
-# test_data = MVTecDataset(root=test_path, transform=data_transform, gt_transform=gt_transform, phase="test")
-# test_dataloader = DataLoader(test_data, batch_size=1, shuffle=False)
-
+''' Load testing data '''
 train_dataloader, test_dataloader = load_data(dataset_name=dataset_name, normal_class=0, args=args)
 
 ''' Autoencoder model '''
@@ -59,17 +57,30 @@ total_errors = []
 y_true = []
 result = []
 
-# calculate the average reconstruction error on training data
+# Calculate the average reconstruction error on training data (normal)
 training_error = []
 for img, label in train_dataloader:
     img = img.to(device)
     output = model(img)
     training_error.append(loss_function(img, output).item())
 
-# Calculate the average reconstruction error on normal training data
-avg_normal_error = np.mean(training_error)
+print("\n===== Training Data =====")
+avg_raw_error = np.mean(training_error)
+print('Average Normal Error: {:.4f}'.format(avg_raw_error))
+
+std_error = np.std(training_error)
+avg_normal_error = avg_raw_error + 2*std_error
+print('New Average Normal Error: {:.4f}, Std: {:.4f}'.format(avg_normal_error, std_error))
+
+max_normal_error = np.max(training_error)
+print('Max Normal Error: {:.4f}'.format(max_normal_error))
+print("=========================\n")
+
 result.append({
-    "Average Normal Error": avg_normal_error
+    "Average Normal Error": avg_normal_error,
+    "Max Normal Error": max_normal_error,
+    "Average Raw Error": avg_raw_error,
+    "std_error": std_error,
 })
 
 # Evaluate on testing data
@@ -93,7 +104,10 @@ for idx, (img, label) in enumerate(tqdm(test_dataloader)):
         save_image(make_grid(invTrans(torch.cat([img, output]))), "{}/{}.png".format(figure_path, idx))
 
 y_pred_avg = [1 if error > avg_normal_error else 0 for error in total_errors]
+y_pred_max = [1 if error > max_normal_error else 0 for error in total_errors]
 print('Accuracy [mean]: {:.4f}'.format(accuracy_score(y_true, y_pred_avg)))
+print('Accuracy [max]: {:.4f}'.format(accuracy_score(y_true, y_pred_max)))
+print('Accuracy [roc]: {:.4f}'.format(roc_auc_score(y_true, total_errors)))
 
 with open("./jsons/result.json", "w+") as f:
     json.dump(result, f, indent=4)
