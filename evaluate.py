@@ -20,6 +20,7 @@ parser.add_argument('--img_size', default=256, type=int)
 parser.add_argument('--latent_dim', default=32, type=int)
 parser.add_argument('--ckpt_pth', default="./checkpoint/", type=str)
 parser.add_argument('--figure_dir', default="./figures/", type=str)
+parser.add_argument('--result_dir', default="./results/", type=str)
 parser.add_argument('--num_samples', default=50, type=int)
 parser.add_argument('--seed', default=0, type=int)
 args = parser.parse_args()
@@ -42,11 +43,11 @@ ckpt_path = args.ckpt_pth
 latent_dim = args.latent_dim
 num_samples = args.num_samples
 ckp_path = ckpt_path + dataset_name +'.pth'
-
 figure_path = args.figure_dir + dataset_name
-# verify_path = args.figure_dir + dataset_name + "/verify"
+result_path = args.result_dir
+
 os.makedirs(figure_path, exist_ok=True)
-# os.makedirs(verify_path, exist_ok=True)
+os.makedirs(result_path, exist_ok=True)
 
 ''' Load testing data '''
 train_dataloader, test_dataloader = load_data(dataset_name=dataset_name, normal_class=0, args=args)
@@ -140,4 +141,4 @@ plt.xlabel('Reconstruction Error')
 plt.ylabel('Density')
 plt.title(title)
 plt.legend()
-plt.savefig("{}/result_{}.png".format(args.figure_dir, args.abnormal_class))
+plt.savefig("{}/result_{}.png".format(result_path, args.abnormal_class))
