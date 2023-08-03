@@ -1,6 +1,8 @@
 __pycache__/
+
 data/
 video/
+video_previous/
 
 checkpoint/
 figures/

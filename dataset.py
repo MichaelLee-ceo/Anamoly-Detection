@@ -70,17 +70,23 @@ class WindDataset(Dataset):
         self.root = root
         self.transform = transform
         self.normal = getImage(os.path.join(self.root, "normal"))
-        self.abnormal = getImage(os.path.join(self.root, "abnormal"))
+        self.abnormal = getImage(os.path.join(self.root, "abnormal" + "/" + args.abnormal_class))
 
         random.shuffle(self.normal)
-        num_abnormal = len(self.abnormal)
+        train_size = int(len(self.normal) * 0.8)
+
+        # Concatentate abnormal and new abnormal data
+        # self.abnormal += self.new_abnormal
 
         if train:
-            self.data = self.normal[num_abnormal:]
+            self.data = self.normal[:train_size]
             self.label = [0] * len(self.data)
+            print("[Trainset] Normal data: {}".format(len(self.data)))
+
         else:
-            self.data = self.normal[:num_abnormal] + self.abnormal
-            self.label = [0] * len(self.normal[:num_abnormal]) + [1] * len(self.abnormal)
+            self.data = self.normal[train_size:] + self.abnormal
+            self.label = [0] * len(self.normal[train_size:]) + [1] * len(self.abnormal)
+            print("[Testset] Normal data: {}, Abnormal data: {}".format(len(self.normal[train_size:]), len(self.abnormal)))
 
     def __len__(self):
         return len(self.data)

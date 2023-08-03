@@ -10,7 +10,7 @@ parser.add_argument("--video_info_file", default="./jsons/video_info.json", type
 args = parser.parse_args()
 
 # find files in the directory
-directories = ['normal', 'abnormal']
+directories = ['normal', 'abnormal/normal_out', 'abnormal/normal_in', 'abnormal/low_in', 'abnormal/high_out']
 info, info_total = [], []
 for directory in directories:
     path = os.path.join(args.video_path, directory)
