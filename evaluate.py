@@ -13,8 +13,8 @@ from torchvision.utils import make_grid, save_image
 from sklearn.metrics import accuracy_score, roc_auc_score
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset_name', default="windmill", type=str)
-parser.add_argument('--abnormal_class', default="normal_out", type=str)
+parser.add_argument('--dataset_name', default="mimii", type=str)
+parser.add_argument('--abnormal_class', default="", type=str)
 parser.add_argument('--batch_size', default=1, type=int)
 parser.add_argument('--img_size', default=256, type=int)
 parser.add_argument('--latent_dim', default=32, type=int)

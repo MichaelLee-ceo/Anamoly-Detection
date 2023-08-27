@@ -8,6 +8,15 @@ from torchvision import datasets
 from torch.utils.data import Dataset, DataLoader
 
 
+def getImage(path):
+    files = []
+    for file in os.listdir(path):
+        if file.endswith(".png"):
+            img = Image.open(os.path.join(path, file)).convert('RGB')
+            files.append(img)
+    return files
+
+
 def load_data(dataset_name="mnist", normal_class=0, args=None):
     img_size = args.img_size
     batch_size = args.batch_size
@@ -51,19 +60,26 @@ def load_data(dataset_name="mnist", normal_class=0, args=None):
         
         print("Normal training data: {}, {}".format(len(dataset.data), dataset.data[0].size))
         print("Testing data: {}, {}".format(len(testset.data), testset.data[0].size))
+
+    elif dataset_name == "mimii":
+        img_transform = transforms.Compose([
+            transforms.CenterCrop(480),
+            transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+        path = "./data/Mimii/{}dB/{}/id_{}/".format(args.num_db, args.machine_type, args.machine_id)
+        dataset = WindDataset(root=path, train=True, transform=img_transform, args=args)
+        testset = WindDataset(root=path, train=False, transform=img_transform, args=args)
+        
+        print("Normal training data: {}, {}".format(len(dataset.data), dataset.data[0].size))
+        print("Testing data: {}, {}".format(len(testset.data), testset.data[0].size))
     
     train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(testset, batch_size=1, shuffle=True)
-
     return train_loader, test_loader
 
-def getImage(path):
-    files = []
-    for file in os.listdir(path):
-        if file.endswith(".png"):
-            img = Image.open(os.path.join(path, file)).convert('RGB')
-            files.append(img)
-    return files
 
 class WindDataset(Dataset):
     def __init__(self, root, train=True, transform=None, args=None):
