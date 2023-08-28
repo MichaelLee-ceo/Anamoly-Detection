@@ -91,9 +91,6 @@ class WindDataset(Dataset):
         random.shuffle(self.normal)
         train_size = int(len(self.normal) * 0.8)
 
-        # Concatentate abnormal and new abnormal data
-        # self.abnormal += self.new_abnormal
-
         if train:
             self.data = self.normal[:train_size]
             self.label = [0] * len(self.data)

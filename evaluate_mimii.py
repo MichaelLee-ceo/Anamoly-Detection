@@ -40,8 +40,6 @@ invTrans = transforms.Compose([
 ])
 
 dataset_name = args.dataset_name
-batch_size = args.batch_size
-img_size = args.img_size
 ckpt_path = args.ckpt_pth
 latent_dim = args.latent_dim
 num_samples = args.num_samples
@@ -75,11 +73,7 @@ for num_db in num_dbs:
         model.load_state_dict(torch.load(ckp_path))
         model.eval()
 
-        normal_errors = []
-        total_errors = []
-        y_true = []
-
-        # Calculate the average reconstruction error on training data (normal)
+        ''' Calculate the average reconstruction error on training data (normal) '''
         training_error = []
         for img, label in train_dataloader:
             img = img.to(device)
@@ -91,16 +85,16 @@ for num_db in num_dbs:
         avg_normal_error_1 = avg_raw_error + 1*std_error
         avg_normal_error_2 = avg_raw_error + 0.5*std_error
 
-        count = 0
-        # Evaluate on testing data
-        normal_errors, abnormal_errors = [], []
+        ''' Evaluate on testing data '''
+        normal_errors, abnormal_errors, total_errors = [], [], []
+        y_true = []
         for idx, (img, label) in enumerate(tqdm(test_dataloader)):
             img = img.to(device)
             output = model(img)
 
             error = loss_function(img, output).item()
             total_errors.append(error)
-            y_true.append(0 if label == 0 else 1)
+            y_true.append(label.item())
 
             if label == 0:
                 normal_errors.append(error)
@@ -131,7 +125,7 @@ for num_db in num_dbs:
         plt.hist(normal_errors, bins=50, density=True, alpha=0.5, label='Normal Data')
         plt.hist(abnormal_errors, bins=50, density=True, alpha=0.5, label='Abnormal Data')
         plt.axvline(avg_normal_error_1, color='r', linestyle='dashed', linewidth=2, label='Mean + 1*std')
-        plt.axvline(avg_normal_error_2, color='r', linestyle='dashed', linewidth=2, label='Mean + 0.5*std')
+        plt.axvline(avg_normal_error_2, color='pink', linestyle='dashed', linewidth=2, label='Mean + 0.5*std')
         plt.xlabel('Reconstruction Error')
         plt.ylabel('Density')
         plt.title(title)

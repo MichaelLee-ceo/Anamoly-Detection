@@ -32,8 +32,6 @@ print("> Using:", device)
 dataset_name = args.dataset
 num_epochs = args.num_epochs
 lr = args.lr
-batch_size = args.batch_size
-img_size = args.img_size
 latent_dim = args.latent_dim
 ckpt_pth = args.ckpt_pth
 
