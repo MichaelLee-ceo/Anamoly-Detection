@@ -16,7 +16,7 @@ parser.add_argument('--machine_id', default="00", type=str)
 parser.add_argument('--machine_type', default="fan", type=str)
 parser.add_argument('--num_epochs', default=50, type=int)
 parser.add_argument('--lr', default=0.003, type=float)
-parser.add_argument('--batch_size', default=32, type=int)
+parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--img_size', default=256, type=int)
 parser.add_argument('--latent_dim', default=128, type=int)
 parser.add_argument('--ckpt_pth', default="./checkpoint/", type=str)
@@ -39,8 +39,10 @@ os.makedirs(ckpt_pth, exist_ok=True)
 
 # loop for all datasets
 machine_types = ["fan"]
-num_dbs = ["6", "0", "min6"]
-machine_ids = ["00", "02", "04", "06"]
+# num_dbs = ["6", "0", "min6"]
+# machine_ids = ["00", "02", "04", "06"]
+num_dbs = ["0"]
+machine_ids = ["00"]
 
 for num_db in num_dbs:
     for machine_id in machine_ids:
